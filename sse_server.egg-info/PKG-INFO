@@ -1,0 +1,9 @@
+Metadata-Version: 2.4
+Name: sse-server
+Version: 0.1.0
+Summary: Add your description here
+Requires-Python: >=3.13
+Description-Content-Type: text/markdown
+Requires-Dist: mcp>=1.7.1
+Requires-Dist: starlette>=0.46.2
+Requires-Dist: uvicorn>=0.34.2
