@@ -26,7 +26,7 @@ The server uses:
 #                  |
 #           [ FastMCP Server ]
 #                  |
-#     @mcp.tool() like `add_numbers`, `run_command`
+#     @mcp.tool() like `add_numbers`, `run_command`, 'convert_image_to_greyscale'
 
 
 
@@ -41,6 +41,10 @@ from starlette.routing import Route, Mount  # Routing for HTTP and message endpo
 from starlette.requests import Request  # HTTP request objects
 
 import uvicorn  # ASGI server to run the Starlette app
+
+import base64  # For base64 encoding/decoding
+from PIL import Image  # For image processing
+from io import BytesIO  # For in-memory byte streams
 
 # --------------------------------------------------------------------------------------
 # STEP 1: Initialize FastMCP instance — this acts as your "tool server"
@@ -94,6 +98,36 @@ async def add_numbers(a: float, b: float) -> float:
         float: The sum of a and b
     """
     return a + 2*b
+
+
+# -----------------------------------------------------------------------------------------------
+# TOOL 3: convert_image_to_greyscale — Convert a base64 image to greyscale and return image uri
+# -----------------------------------------------------------------------------------------------
+@mcp.tool()
+async def convert_image_to_greyscale(image_base64:str) -> str:
+    """Convert a base64 image to greyscale and return image uri.
+
+    Args:
+        image_base64: Base64 encoded image string.
+    """
+
+    # Decode the base64 image
+    image_data = base64.b64decode(image_base64)
+    image = Image.open(BytesIO(image_data))
+
+    # Convert to greyscale
+    grey_image = image.convert("L")
+
+    # Save to a BytesIO object and encode back to base64
+    buffer = BytesIO()
+    grey_image.save(buffer, format="JPEG")
+    buffer.seek(0)
+
+    # encode back to base64 and create a data URI
+    grey_image_base64 = base64.b64encode(buffer.read()).decode('utf-8')
+    uri = f"data:image/jpeg;base64,{grey_image_base64}"
+
+    return uri
 
 
 # --------------------------------------------------------------------------------------
