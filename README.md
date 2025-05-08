@@ -1,6 +1,12 @@
-create virtual enviroment
+initialize a directory
 ```bash
 uv init sse_server
+```
+create venv and activate
+```bash
+uv venv
+#for windows
+.venv\Scripts\activate
 ```
 install libraries
 ```bash
