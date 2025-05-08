@@ -46,6 +46,8 @@ import base64  # For base64 encoding/decoding
 from PIL import Image  # For image processing
 from io import BytesIO  # For in-memory byte streams
 
+import requests  # For making HTTP requests (if needed)
+
 # --------------------------------------------------------------------------------------
 # STEP 1: Initialize FastMCP instance — this acts as your "tool server"
 # --------------------------------------------------------------------------------------
@@ -104,16 +106,17 @@ async def add_numbers(a: float, b: float) -> float:
 # TOOL 3: convert_image_to_greyscale — Convert a base64 image to greyscale and return image uri
 # -----------------------------------------------------------------------------------------------
 @mcp.tool()
-async def convert_image_to_greyscale(image_base64:str) -> str:
-    """Convert a base64 image to greyscale and return image uri.
+async def convert_image_to_greyscale(image_url:str) -> str:
+    """Convert an image to greyscale and return image uri.
 
     Args:
-        image_base64: Base64 encoded image string.
+        image_url: url for the image.
     """
 
-    # Decode the base64 image
-    image_data = base64.b64decode(image_base64)
-    image = Image.open(BytesIO(image_data))
+    # get the image data from url
+    response = requests.get(image_url)
+    if response.status_code == 200:
+        image = Image.open(BytesIO(response.content))
 
     # Convert to greyscale
     grey_image = image.convert("L")
